@@ -1,0 +1,119 @@
+select 123.456, -123.456, abs(123.456), abs(-123.456);
+select 123.456, -123.456, ceiling(123.456), ceiling(-123.456);
+select 123.456, -123.456, floor(123.456), floor(-123.456);
+select 123.456, -123.456, truncate(123.456, 2), truncate(-123.456,2);
+select round(123.456, 2),round(123.123, 2), round(-123.456,2), round(-123.123,2);
+select pow(2,4);
+select greatest(30,20,50,10,40,20,15);
+select least(30,20,50,10,40,20,15);
+
+select interval(30,10,15,20,25,33,45);  ### 30의 위치 : 10,15,20,25, (30), 33,45 
+select interval(30,10,45,15,20,25,33);  ### 30의 위치 :  10,(30),45,15,20,25,33
+## 나열된 원소 중에서 맨처음 원소값의 자신의 위치 리턴
+## 위치 기준 : 맨처음 자신보다 큰값의 원소 앞, 자신 보다 작은 원소값보다 뒤임
+
+
+select interval(65,60,70,80,90);
+
+select *, substring('가양미우수',interval(avg,-1,60,70,80,90), 1) from
+(select *, (ifnull(kor,0)+ifnull(eng,0)+ifnull(mat,0))/3 as avg from exam) tt;
+
+
+
+select pid, count(*), count(kor), sum(kor), avg(kor),max(kor), min(kor) from exam
+group by pid;
+
+select pid, count(*), count(kor), avg(kor) from exam
+where kor>=78
+group by pid;
+
+select pid, count(*), count(kor), avg(kor) from exam
+group by pid
+having avg(kor) >=78;
+
+
+##### 1학기 시험 중 학생평균이 60점 이상인 학생의 
+### 시험 횟수와 각과목별 최대, 최소 점수를 출력하세요
+
+
+select pid, count(*), max(kor),min(kor), max(eng),min(eng), max(mat),min(mat) from
+(select *,  (ifnull(kor,0)+ifnull(eng,0)+ifnull(mat,0))/3 as avg from exam
+where name like '1학기%') tt
+group by pid
+having avg(avg)>=60;	
+
+
+select *, if(kor>=70,'합격','불합격') from exam;
+
+select *,
+case pid
+when 'aaa' then '장동건'
+when 'bbb' then '조인성'
+when 'ccc' then '정우성'
+when 'ddd' then '현빈'
+else '일반배우'
+end
+ from exam;
+ 
+ 
+select *,
+case 
+when kor>=90 then '수'
+when kor>=80 then '우'
+when kor>=70 then '미'
+when kor>=60 then '양'
+else '가'
+end
+ from exam;
+ 
+ 
+ create table stud(
+	id text,
+    name text,
+    birth date,
+    ban int
+ );
+ 
+ 
+ insert into stud (id, name, birth, ban) values
+ ('aaa','장동건','1977-02-23',1),
+ ('bbb','조인성','1980-05-14',2),
+ ('ccc','정우성','2002-06-20',3),
+ ('ddd','한가인','1998-09-05',1),
+ ('eee','김태희','1980-11-19',2),
+ ('fff','김혜수','1971-06-30',3),
+ ('ggg','정한성','2002-08-07',1),
+ ('hhh','이송','2003-01-16',2);
+ 
+select * from stud;
+ 
+TRUNCATE stud;
+ 
+ ### 올해 생일 파티를 출력하세요 
+ ## 단 토, 일 인경우 금요일로 앞당겨 할 것
+ 
+ select *, date_format(now_birth, '%a') ,
+ case 
+ date_format(now_birth, '%w')
+ when 0 then date_sub(now_birth, interval 2 day)
+ when 6 then date_sub(now_birth, interval 1 day)
+ else
+ now_birth
+ end as party
+ from(
+ select *,
+ concat(date_format(sysdate(), '%Y-'), date_format(birth, '%m-%d')) as now_birth 
+ from stud) tt;
+ 
+ ########################################################
+ 
+ select *, date_format(now_birth, '%a') ,
+ if( date_format(now_birth, '%w') =0,date_sub(now_birth, interval 2 day), 
+ if( date_format(now_birth, '%w') =6 , date_sub(now_birth, interval 1 day),  
+ now_birth)) as party
+ from(
+ select *,
+ concat(date_format(sysdate(), '%Y-'), date_format(birth, '%m-%d')) as now_birth 
+ from stud) tt;
+ 
+ 
